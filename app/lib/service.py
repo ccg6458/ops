@@ -7,7 +7,7 @@ import paramiko, redis
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-import random,time
+import random, datetime, fcntl
 
 
 class ShellExec():
@@ -26,9 +26,19 @@ class ShellExec():
         self.ssh.connect(hostname=ip, port=22, username="root", pkey=private_key)
         stdin, stdout, stderr = self.ssh.exec_command(shell)
         result = stdout.read().decode()
-
-
+        now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        cron_info = "主机ip  :{}\n执行时间: {}\n当前任务: {}".format(str(ip), now, shell)
+        self.log_to_file(cron_info, result)
         self.ssh.close()
+
+    def log_to_file(self, cron_info, res):
+        filename = Config.APP_DIR + '/logs/cron-' + datetime.datetime.now().strftime("%Y-%m-%d") + '.log'
+        with open(filename, 'a') as f:
+            fcntl.flock(f, fcntl.LOCK_EX)
+            f.writelines(cron_info + '\n')
+            f.writelines(res + '\n')
+            f.writelines('----------------------------------------\n')
+            fcntl.flock(f, fcntl.LOCK_UN)
 
 
 class CronJob():
@@ -66,16 +76,18 @@ class CronJob():
     def init_cronjob(self, list):
         for data in list:
             self.add_cronjob(data['schedule'], data['shell'], str(data['id']), data['ip'])
-    def exec_sql(self,id,sql_list):
 
-        db=Mymysql()
-        finish_sql='update test.workorder set finish=1 where id='+id
+    def exec_sql(self, id, sql_list):
+
+        db = Mymysql()
+        finish_sql = 'update test.workorder set finish=1 where id=' + id
         for sql in sql_list:
             db.execute_sql(sql)
         db.execute_sql(finish_sql)
         db.close()
-    def add_sql_job(self,id,sql):
-        self.sched.add_job(self.exec_sql,args=[id,sql])
+
+    def add_sql_job(self, id, sql):
+        self.sched.add_job(self.exec_sql, args=[id, sql])
 
     def start(self, list):
         self.init_cronjob(list)
@@ -105,7 +117,7 @@ class SendMsg():
         self.mail_password = Config.MAIL_PASSWORD
 
     def generate_code(self):
-        code=''
+        code = ''
         for i in range(4):
             j = random.randrange(0, 4)
             if j == 1:
@@ -119,7 +131,7 @@ class SendMsg():
                 code = code + a
         return code
 
-    def content(self,code):
+    def content(self, code):
         message = """本次登陆验证码为: %s,有效期两分钟。
                 """ % (code)
         email_content = MIMEText(message)
@@ -131,7 +143,7 @@ class SendMsg():
             return True
         return False
 
-    def send(self, email_address,code):
+    def send(self, email_address, code):
         email = MIMEMultipart()
         if self.check_email(email_address):
             email['from'] = self.mail_user
