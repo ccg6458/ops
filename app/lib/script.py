@@ -1,8 +1,8 @@
 import pymysql
-
+from app.config import Config
 import paramiko
 
-private_key = paramiko.RSAKey.from_private_key_file('/Users/mc/.ssh/id_rsa')
+private_key = paramiko.RSAKey.from_private_key_file(Config.PRIVATE_KEY)
 
 ssh = paramiko.SSHClient()
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
