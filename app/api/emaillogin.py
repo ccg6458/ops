@@ -13,9 +13,6 @@ class EmailLogin(SecurityResource):
         if not code:
             return self.render_json(code=1001)
 
-        if code == str(1234):
-            login_user(user, remember=True)
-            return self.render_json(data={'url': '/task'})
         redis_conn = MyRedis()
         redis_code = redis_conn.get_str(email)
         if redis_code:
