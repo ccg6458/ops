@@ -13,6 +13,7 @@ class TaskModel(BaseModel):
     business_id = db.Column(Integer, ForeignKey(BusinessModel.id))
     schedule = db.Column(String(64))
     shell = db.Column(TEXT)
+    comment = db.Column(String(128))
     business = relationship("BusinessModel", backref="task")
     create_time = db.Column(DateTime,default=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
