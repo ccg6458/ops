@@ -1,5 +1,6 @@
 from . import SecurityResource
 from app.model.workorder import WorkOrderModel
+from app.model.user import UserModel
 from app.form.workorder import WorkOrderForm
 from app.lib.script import Mymysql
 from app.lib.http_res import BaseHttpException

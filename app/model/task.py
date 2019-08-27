@@ -1,5 +1,5 @@
 from app.lib.extensions import db
-from sqlalchemy import String, Integer, ForeignKey,DateTime
+from sqlalchemy import String, Integer, ForeignKey,DateTime,TEXT
 from sqlalchemy.orm import foreign, remote, relationship
 from . import BaseModel
 from .user import UserModel
@@ -12,7 +12,7 @@ class TaskModel(BaseModel):
     id = db.Column(Integer, primary_key=True, autoincrement=True)
     business_id = db.Column(Integer, ForeignKey(BusinessModel.id))
     schedule = db.Column(String(64))
-    shell = db.Column(String(128))
+    shell = db.Column(TEXT)
     business = relationship("BusinessModel", backref="task")
     create_time = db.Column(DateTime,default=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
