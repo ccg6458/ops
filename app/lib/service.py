@@ -137,20 +137,12 @@ class SendMsg():
         email_content = MIMEText(message)
         return email_content
 
-    def check_email(self, email_address):
-        l1 = email_address.split('@')
-        if len(l1) == 2 and l1[1] == 'mifengkong.cn':
-            return True
-        return False
 
     def send(self, email_address, code):
         email = MIMEMultipart()
-        if self.check_email(email_address):
-            email['from'] = self.mail_user
-            email['to'] = email_address
-            email['subject'] = '登陆验证码'
-            email.attach(self.content(code))
-            self.smtp.login(self.mail_user, self.mail_password)
-            self.smtp.sendmail(self.mail_user, email_address, email.as_string())
-        else:
-            raise BaseHttpException(code=1005)
+        email['from'] = self.mail_user
+        email['to'] = email_address
+        email['subject'] = '登陆验证码'
+        email.attach(self.content(code))
+        self.smtp.login(self.mail_user, self.mail_password)
+        self.smtp.sendmail(self.mail_user, email_address, email.as_string())

@@ -10,6 +10,9 @@ class EmailLogin(SecurityResource):
         email = request.form.get('email')
         code = request.form.get('code')
         user = UserModel.query.filter_by(email=email).first()
+        if not self.check_email(email):
+            return self.render_json(code=1005)
+        
         if not code:
             return self.render_json(code=1001)
 
@@ -27,3 +30,9 @@ class EmailLogin(SecurityResource):
             login_user(user, remember=True)
             return self.render_json(data={'url': '/task'})
         return self.render_json(code=1001)
+
+    def check_email(self, email_address):
+        l1 = email_address.split('@')
+        if len(l1) == 2 and l1[1] == 'mifengkong.cn':
+            return True
+        return False
