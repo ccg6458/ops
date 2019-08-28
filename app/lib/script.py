@@ -12,7 +12,7 @@ class Mymysql():
                                   mysql['password'], mysql['database'])
         self.cursor = self.db.cursor()
 
-    def execute_sql(self, sql):
+    def execute_one_sql(self, sql):
         try:
             self.cursor.execute(sql)
             data = self.cursor.fetchall()
@@ -22,6 +22,18 @@ class Mymysql():
             self.success = 0
             self.rollback()
             return False, e.args
+    def batch_execute_sql(self,sql_list):
+        try:
+            for sql in sql_list:
+                self.cursor.execute(sql)
+        except Exception as e:
+            self.rollback()
+            return False,e.args
+        else:
+            self.db.commit()
+            return True,''
+
+
 
     def rollback(self):
         self.db.rollback()
