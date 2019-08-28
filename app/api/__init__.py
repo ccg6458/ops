@@ -95,7 +95,7 @@ class SecurityResource(ApiResource):
             action = self.action
         if not module:
             module = self.module
-        username = current_user.name if current_user.name else current_user.email
+        username = current_user.name if current_user.name else current_user.email.split('@')[0]
         action_cn = self.action_msg[action]
         module_cn = self.module_msg[module]
         if action == 'create':
