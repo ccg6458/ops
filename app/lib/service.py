@@ -82,9 +82,9 @@ class CronJob():
         db = Mymysql()
         finish_sql = 'update ops_db.workorder set finish=1 where id=' + id
         flag, data = db.batch_execute_sql(sql_list)
-        data=str(data).replace('\'','\\\'')
+        data_escape=str(data).replace('\'','\\\'')
         if not flag:
-            result_sql = "update ops_db.workorder set result='%s' where id=%s " % (data, id)
+            result_sql = "update ops_db.workorder set result='%s' where id=%s " % (data_escape, id)
             db.execute_one_sql(result_sql)
             db.close()
             return
