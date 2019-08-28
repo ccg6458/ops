@@ -21,6 +21,7 @@ class WorkOrderModel(BaseModel):
     database = db.Column(String(32))
     audit = db.Column(Integer,default=0)
     finish = db.Column(Integer,default=0)
+    result = db.Column(String(256))
     user_id = db.Column(Integer, ForeignKey(UserModel.id))
     userinfo = relationship("UserModel", backref="work")
     create_time = db.Column(DateTime,default=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
