@@ -44,7 +44,7 @@ class WorkOrderApi(SecurityResource):
         sql = form.sql.data
 
         comment = form.comment.data
-        database = form.database.data if form.database.data else 'test'
+        database = form.database.data if form.database.data else 'ops_db'
         value_list = [type, name, sql, comment]
         workinfo = dict(zip(self.cloumn, value_list))
         workinfo['type'] = 1
@@ -87,7 +87,7 @@ class WorkOrderApi(SecurityResource):
     def database(self):
         super(WorkOrderApi, self).get()
         db = Mymysql()
-        success, db_list = db.execute_sql('show databases')
+        success, db_list = db.execute_one_sql('show databases')
         db.close()
         if not success:
             return self.render_json(code=3000, message=db_list)
@@ -131,7 +131,7 @@ class WorkOrderApi(SecurityResource):
     def batch_execute_sql(self, sql_list):
         db = Mymysql()
         for sql in sql_list:
-            success, res = db.execute_sql(sql)
+            success, res = db.execute_one_sql(sql)
             if not success:
                 raise BaseHttpException(code=3000, message=res)
         db.close()

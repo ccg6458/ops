@@ -68,7 +68,7 @@ class CronJob():
 
     def add_cronjob(self, schedule, shell, id, ip):
         self.sched.add_job(self.job_fun, CronTrigger.from_crontab(schedule), args=[ip, shell], id=id,
-                           replace_existing=True,max_instances=5)
+                           replace_existing=True, max_instances=5)
 
     def remove_crontjob(self, id):
         self.sched.remove_job(str(id))
@@ -80,11 +80,17 @@ class CronJob():
     def exec_sql(self, id, sql_list):
 
         db = Mymysql()
-        finish_sql = 'update test.workorder set finish=1 where id=' + id
-        for sql in sql_list:
-            print(sql)
-            db.execute_sql(sql)
-        db.execute_sql(finish_sql)
+        finish_sql = 'update ops_db.workorder set finish=1 where id=' + id
+        flag, data = db.batch_execute_sql(sql_list)
+        data=str(data).replace('\'','\\\'')
+        if not flag:
+            result_sql = "update ops_db.workorder set result='%s' where id=%s " % (data, id)
+            db.execute_one_sql(result_sql)
+            db.close()
+            return
+        result_sql = "update ops_db.workorder set result='success' where id=" +id
+        db.execute_one_sql(result_sql)
+        db.execute_one_sql(finish_sql)
         db.close()
 
     def add_sql_job(self, id, sql):
@@ -137,7 +143,6 @@ class SendMsg():
                 """ % (code)
         email_content = MIMEText(message)
         return email_content
-
 
     def send(self, email_address, code):
         email = MIMEMultipart()
