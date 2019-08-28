@@ -16,7 +16,8 @@ class WorkOrderApi(SecurityResource):
 
         if tag:
             func = getattr(self, tag, 'database')
-            return func()
+            id=request.args['workId']
+            return func(id)
         super(WorkOrderApi, self).get()
 
         work_list = []
@@ -24,7 +25,9 @@ class WorkOrderApi(SecurityResource):
         if current_user.is_super():
             works = WorkOrderModel.query.all()
             for work in works:
-                work_list.append(work.to_json())
+                data1=work.to_json()
+                data1.update({'show': 1})
+                work_list.append(data1)
             data['super'] = 1
             data['work'] = work_list
             return self.render_json(data=data)
@@ -84,7 +87,7 @@ class WorkOrderApi(SecurityResource):
         TaskModel.query.filter_by(id=id).delete()
         cron.remove_crontjob(id)
 
-    def database(self):
+    def database(self,id):
         super(WorkOrderApi, self).get()
         db = Mymysql()
         success, db_list = db.execute_one_sql('show databases')
@@ -144,3 +147,18 @@ class WorkOrderApi(SecurityResource):
         cron.add_sql_job(id,sql_list)
         WorkOrderModel.query.filter_by(id=id).update({'audit': 1})
         return self.render_json()
+
+    def execute(self, id):
+        self.super_api=True
+        super(WorkOrderApi,self).put()
+        work = WorkOrderModel.query.filter_by(id=id).first()
+        if work.finish==1:
+            return self.render_json(message='无法重复执行')
+        sql_list=work.sql.split(';')
+        cron.add_sql_job(id,sql_list)
+        return self.render_json(message='执行完成，请查看结果')
+
+    def item(self,id):
+        work= WorkOrderModel.query.filter_by(id=id).first()
+        data=work.to_json()
+        return self.render_json(data=data)
