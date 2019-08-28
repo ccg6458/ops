@@ -32,7 +32,6 @@ class TaskApi(SecurityResource):
             return self.render_json(data=task)
 
         super(TaskApi, self).get()
-        print(cron.sched.get_jobs())
         task_list = []
         if current_user.is_super():
             tasks = TaskModel.query.all()
@@ -59,11 +58,11 @@ class TaskApi(SecurityResource):
         task = TaskModel(**taskinfo)
         task.save()
         cron.add_cronjob(schedule, shell, str(task.id), ip)
-        self.log(name=shell)
+        self.log(info=shell)
         return self.render_json()
 
     def put(self, id):
-        super(TaskApi, self).post()
+        super(TaskApi, self).put()
         form = TaskForm(request.form, csrf=False)
         schedule = form.schedule.data
         shell = form.shell.data
@@ -72,9 +71,17 @@ class TaskApi(SecurityResource):
         ip = BusinessModel.query.filter_by(id=business_id).first().host
         value_list = [business_id, schedule, shell, comment]
         taskinfo = dict(zip(self.cloumn, value_list))
+        task = TaskModel.query.filter_by(id=id).first()
+        before_list = [task.business_id, task.schedule, task.shell, task.comment]
+        if value_list == before_list:
+            print('无需更新')
+            return self.render_json()
+        before = '任务id:' + str(id) + ' 周期:' + task.schedule + ' 命令:' + task.shell
+        after = '任务id:' + str(id) + ' 周期:' + schedule + ' 命令:' + shell
         TaskModel.query.filter_by(id=id).update(taskinfo)
         cron.remove_crontjob(id)
         cron.add_cronjob(schedule, shell, str(id), ip)
+        self.log(before=before, after=after)
         return self.render_json()
 
     def delete(self, id):
