@@ -58,7 +58,8 @@ class TaskApi(SecurityResource):
         task = TaskModel(**taskinfo)
         task.save()
         cron.add_cronjob(schedule, shell, str(task.id), ip)
-        self.log(info=shell)
+        info =  '周期:' + schedule + ' 命令:' + shell
+        self.log(info=info)
         return self.render_json()
 
     def put(self, id):
