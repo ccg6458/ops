@@ -82,6 +82,7 @@ class CronJob():
         db = Mymysql()
         finish_sql = 'update test.workorder set finish=1 where id=' + id
         for sql in sql_list:
+            print(sql)
             db.execute_sql(sql)
         db.execute_sql(finish_sql)
         db.close()
