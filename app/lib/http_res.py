@@ -28,7 +28,7 @@ class Code():
     only_super = 2000
     not_permission = 2001
 
-    #: ----------------------- 3xxx 权限相关错误 -----------------
+    #: ----------------------- 3xxx sql相关错误 -----------------
     sql_execute_error = 3000
 
     code_msg = {
