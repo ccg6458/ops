@@ -41,7 +41,7 @@ class UserApi(SecurityResource):
         user.save()
         if not user.success:
             return self.render_json(code=1003)
-        self.log(name=userinfo['name'])
+        self.log(info=userinfo['name'])
         return self.render_json()
 
     def put(self, id):
@@ -57,5 +57,5 @@ class UserApi(SecurityResource):
         user = UserModel.query.filter_by(id=id)
         name = user.first().name
         user.delete()
-        self.log(name=name)
+        self.log(info=name)
         return self.render_json()
