@@ -10,7 +10,7 @@ from app.lib.extensions import cron
 
 
 class WorkOrderApi(SecurityResource):
-    cloumn = ['type', 'name', 'sql', 'database', 'comment']
+    cloumn = ['type', 'name', 'sql', 'comment']
 
     def get(self, tag=None):
 
@@ -45,11 +45,9 @@ class WorkOrderApi(SecurityResource):
 
         comment = form.comment.data
         database = form.database.data if form.database.data else 'test'
-        value_list = [type, name, sql, database, comment]
+        value_list = [type, name, sql, comment]
         workinfo = dict(zip(self.cloumn, value_list))
         workinfo['type'] = 1
-        workinfo['database'] = database
-        db.execute_sql('use ' + database)
         flag, res = self.check_sql(sql)
         if flag == 1:
             # 自动审核
@@ -103,6 +101,7 @@ class WorkOrderApi(SecurityResource):
         return self.render_json(data=data)
 
     def check_sql(self, sql):
+        Manipulation_list=['create','delete','update','alter','insert']
         flag = 1
         sql_list = sql.split(';')
         res = []
@@ -111,16 +110,20 @@ class WorkOrderApi(SecurityResource):
             sql_split = sql_line.split()
             if sql_line == '':
                 continue
-            if len(sql_split) < 2:
+            if len(sql_split) < 2 :
                 flag = 2
                 break
             res.append(sql_line)
             Manipulation = sql_split[0]
             Resource = sql_split[1]
+            if Manipulation.lower() not in Manipulation_list:
+                flag = 2
+                break
             if not (Manipulation.lower() == 'create'
                     and Resource.lower() == 'table'):
                 flag = 3
                 break
+
         if len(res) == 0:
             flag = 2
         return flag, res
@@ -134,6 +137,8 @@ class WorkOrderApi(SecurityResource):
         db.close()
 
     def audit(self, id):
+        self.super_api=True
+        super(WorkOrderApi,self).put()
         work = WorkOrderModel.query.filter_by(id=id).first()
         sql_list=work.sql.split(';')
         cron.add_sql_job(id,sql_list)
