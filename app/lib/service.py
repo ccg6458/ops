@@ -31,8 +31,10 @@ class ShellExec():
         self.log_to_file(cron_info, result)
         self.ssh.close()
 
-    def log_to_file(self, cron_info, res):
-        filename = Config.APP_DIR + '/logs/cron-' + datetime.datetime.now().strftime("%Y-%m-%d") + '.log'
+    @classmethod
+    def log_to_file(self, cron_info, res, filename=None):
+        if not filename:
+            filename = Config.APP_DIR + '/logs/cron-' + datetime.datetime.now().strftime("%Y-%m-%d") + '.log'
         with open(filename, 'a') as f:
             fcntl.flock(f, fcntl.LOCK_EX)
             f.writelines(cron_info + '\n')
@@ -67,8 +69,14 @@ class CronJob():
         cmd.exec(ip, shell)
 
     def add_cronjob(self, schedule, shell, id, ip):
-        self.sched.add_job(self.job_fun, CronTrigger.from_crontab(schedule), args=[ip, shell], id=id,
-                           replace_existing=True, misfire_grace_time=5)
+        try:
+            self.sched.add_job(self.job_fun, CronTrigger.from_crontab(schedule), args=[ip, shell], id=id,
+                               replace_existing=True, misfire_grace_time=5)
+        except:
+            cron_info = '定时任务id:' + id + ' 周期:' + schedule + ' 命令:' + shell + ' 添加失败'
+            ShellExec.log_to_file(cron_info=cron_info, res='',
+                                  filename=Config.APP_DIR + '/logs/error-' + datetime.datetime.now().strftime(
+                                      "%Y-%m-%d") + '.log')
 
     def remove_crontjob(self, id):
         self.sched.remove_job(str(id))
@@ -82,13 +90,13 @@ class CronJob():
         db = Mymysql()
         finish_sql = 'update ops_db.workorder set finish=1 where id=' + id
         flag, data = db.batch_execute_sql(sql_list)
-        data_escape=str(data).replace('\'','\\\'')
+        data_escape = str(data).replace('\'', '\\\'')
         if not flag:
             result_sql = "update ops_db.workorder set result='%s' where id=%s " % (data_escape, id)
             db.execute_one_sql(result_sql)
             db.close()
             return
-        result_sql = "update ops_db.workorder set result='success' where id=" +id
+        result_sql = "update ops_db.workorder set result='success' where id=" + id
         db.execute_one_sql(result_sql)
         db.execute_one_sql(finish_sql)
         db.close()
