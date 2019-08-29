@@ -1,6 +1,7 @@
 app/config/settings.py
 __pycache__/
 *.py[cod]
+*.log
 .idea/
 .python-version
 .env
