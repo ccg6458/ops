@@ -96,5 +96,9 @@ class TaskApi(SecurityResource):
 
     def delete(self, id):
         super(TaskApi, self).delete()
+        task=TaskModel.query.filter_by(id=id).first()
+        info = '任务id:' + str(id) + ' 周期:' + task.schedule + ' 命令:' + task.shell
         TaskModel.query.filter_by(id=id).delete()
         cron.remove_crontjob(id)
+        self.log(info=info)
+

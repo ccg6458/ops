@@ -90,7 +90,7 @@ class SecurityResource(ApiResource):
     #     sidebar = SideBarModel.query.filter_by(routelink=link).first()
     #     return True if sidebar.is_super == 1 else False
 
-    def log(self, action=None, module=None, info=None,before=None,after=None):
+    def log(self, action=None, module=None, info=None, before=None, after=None):
         if not action:
             action = self.action
         if not module:
@@ -98,10 +98,10 @@ class SecurityResource(ApiResource):
         username = current_user.name if current_user.name else current_user.email.split('@')[0]
         action_cn = self.action_msg[action]
         module_cn = self.module_msg[module]
-        if action == 'create':
+        if action == 'create' or action == 'delete':
             behavior = "{}{} {}".format(action_cn, module_cn, info)
         if action == 'update':
-            behavior = "{}{}  {} 修改至 {}".format(action_cn, module_cn, before,after)
+            behavior = "{}{}  {} 修改至 {}".format(action_cn, module_cn, before, after)
         log = LogModel(username=username, behavior=behavior)
         log.save()
 
