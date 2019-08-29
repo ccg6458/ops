@@ -38,7 +38,6 @@ class WorkOrderApi(SecurityResource):
 
     def post(self):
         super(WorkOrderApi, self).post()
-        db = Mymysql()
         form = WorkOrderForm(request.form, csrf=False)
         name = form.name.data
         sql = form.sql.data
@@ -58,10 +57,10 @@ class WorkOrderApi(SecurityResource):
         elif flag == 3:
             # 人工审核
             pass
+        elif flag == 4:
+            return self.render_json(code=3000, message='请删除注释行')
         else:
-            db.close()
             return self.render_json(code=9999, message='未知错误')
-        db.close()
         workinfo['sql'] = ';\n'.join(res)
         workinfo['user_id'] = current_user.id
         work = WorkOrderModel(**workinfo)
@@ -104,9 +103,19 @@ class WorkOrderApi(SecurityResource):
         res = []
         for sql_line in sql_list:
             sql_line = sql_line.strip()
+            if sql_line.startswith('#'):
+                flag = 4
+                break
+            if sql_line.startswith('/'):
+                flag = 4
+                break
+            if sql_line.startswith('--'):
+                flag = 4
+                break
             sql_split = sql_line.split()
             if sql_line == '':
                 continue
+
             if len(sql_split) < 2:
                 flag = 2
                 break
@@ -119,7 +128,6 @@ class WorkOrderApi(SecurityResource):
             if not (Manipulation.lower() == 'create'
                     and Resource.lower() == 'table'):
                 flag = 3
-                break
 
         if len(res) == 0:
             flag = 2
@@ -138,7 +146,6 @@ class WorkOrderApi(SecurityResource):
         super(WorkOrderApi, self).put()
         id = request.form.get('id')
         work = WorkOrderModel.query.filter_by(id=id).first()
-        print(work)
         sql_list = work.sql.split(';')
         cron.add_sql_job(id, sql_list)
         WorkOrderModel.query.filter_by(id=id).update({'audit': 1})
@@ -146,7 +153,6 @@ class WorkOrderApi(SecurityResource):
 
     def execute(self):
         id = request.form.get('id')
-        print(id)
         self.super_api = True
         super(WorkOrderApi, self).put()
         work = WorkOrderModel.query.filter_by(id=id).first()
@@ -165,6 +171,13 @@ class WorkOrderApi(SecurityResource):
     def edit(self):
         id = request.form.get('id')
         work = WorkOrderModel.query.filter_by(id=id).first()
+        sql = request.form.get('sql')
+        flag, res = self.check_sql(sql)
+        if flag == 2:
+            return self.render_json(code=3000, message='sql不合法')
+        if flag == 4:
+            return self.render_json(code=3000, message='请删除注释')
+
         for col in self.column:
             setattr(work, col, request.form.get(col))
         work.audit = 0
