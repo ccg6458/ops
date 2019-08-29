@@ -1,15 +1,15 @@
-import pymysql
-from app.config import Config
-import paramiko, os
+import pymysql, os
 
 
 class Mymysql():
     success = 1
 
     def __init__(self):
-        mysql = Config.MYSQL_INFO
-        self.db = pymysql.connect(mysql['url'], mysql['user'],
-                                  mysql['password'], mysql['database'])
+        url = os.environ.get('MYSQL_URL', 'localhost')
+        user = os.environ.get('MYSQL_USER', 'root')
+        password = os.environ.get('MYSQL_PASSWORD', 'mifeng888')
+        database = os.environ.get('MYSQL_DATABASE', 'ops_db')
+        self.db = pymysql.connect(url, user, password, database)
         self.cursor = self.db.cursor()
 
     def execute_one_sql(self, sql):
