@@ -1,6 +1,6 @@
 import pymysql
 from app.config import Config
-import paramiko
+import paramiko, os
 
 
 class Mymysql():
@@ -22,18 +22,17 @@ class Mymysql():
             self.success = 0
             self.rollback()
             return False, e.args
-    def batch_execute_sql(self,sql_list):
+
+    def batch_execute_sql(self, sql_list):
         try:
             for sql in sql_list:
                 self.cursor.execute(sql)
         except Exception as e:
             self.rollback()
-            return False,e.args
+            return False, e.args
         else:
             self.db.commit()
-            return True,''
-
-
+            return True, ''
 
     def rollback(self):
         self.db.rollback()
