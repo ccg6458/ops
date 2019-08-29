@@ -80,7 +80,7 @@ class WorkOrderApi(SecurityResource):
         TaskModel.query.filter_by(id=id).delete()
         cron.remove_crontjob(id)
 
-    def database(self, id):
+    def database(self):
         super(WorkOrderApi, self).get()
         db = Mymysql()
         success, db_list = db.execute_one_sql('show databases')
