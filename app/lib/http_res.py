@@ -31,6 +31,9 @@ class Code():
     #: ----------------------- 3xxx sql相关错误 -----------------
     sql_execute_error = 3000
 
+    #: ----------------------- 4xxx 定时任务相关错误 -----------------
+    schedule_error = 4000
+
     code_msg = {
         unlogin: '请先登陆',
         error_pwd: '密码错误',
@@ -40,8 +43,8 @@ class Code():
         exists_user: '该用户已存在',
         only_super: '非管理员无权操作',
         not_permission: '没有该资源权限',
-        sql_execute_error: '数据库执行错误'
-
+        sql_execute_error: '数据库执行错误',
+        schedule_error: '周期格式错误'
     }
 
 

@@ -1,5 +1,6 @@
 from . import SecurityResource
 from app.model.business import BusinessModel, PermissionModel
+from apscheduler.triggers.cron import CronTrigger
 from app.model.task import TaskModel
 from app.model.user import UserModel
 from flask_login import login_required, current_user
@@ -49,6 +50,10 @@ class TaskApi(SecurityResource):
         super(TaskApi, self).post()
         form = TaskForm(request.form, csrf=False)
         schedule = form.schedule.data
+        try:
+            CronTrigger.from_crontab(schedule)
+        except:
+            return self.render_json(code=4000)
         shell = form.shell.data
         comment = form.comment.data
         business_id = form.business_id.data
@@ -66,6 +71,10 @@ class TaskApi(SecurityResource):
         super(TaskApi, self).put()
         form = TaskForm(request.form, csrf=False)
         schedule = form.schedule.data
+        try:
+            CronTrigger.from_crontab(schedule)
+        except:
+            return self.render_json(code=4000)
         shell = form.shell.data
         comment = form.comment.data
         business_id = form.business_id.data
