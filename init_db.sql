@@ -10,7 +10,7 @@ CREATE TABLE log
     id INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
     username VARCHAR(32),
     behavior VARCHAR(128),
-    create_time DATETIME
+    create_time VARCHAR(64)
 );
 CREATE TABLE operation
 (
@@ -39,20 +39,7 @@ CREATE TABLE task
     business_id INT(11),
     schedule VARCHAR(64),
     shell VARCHAR(128),
-    create_time DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-CREATE TABLE test12345
-(
-    id INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    type INT(11),
-    name VARCHAR(128),
-    `sql` TEXT,
-    audit INT(11),
-    finish INT(11),
-    user_id INT(11),
-    create_time DATETIME,
-    comment VARCHAR(128),
-    `database` VARCHAR(32)
+    create_time VARCHAR(64)
 );
 CREATE TABLE user
 (
@@ -73,7 +60,7 @@ CREATE TABLE workorder
     audit INT(11),
     finish INT(11),
     user_id INT(11),
-    create_time DATETIME,
+    create_time VARCHAR(64),
     comment VARCHAR(128),
     `database` VARCHAR(32)
 );
