@@ -68,7 +68,7 @@ class CronJob():
 
     def add_cronjob(self, schedule, shell, id, ip):
         self.sched.add_job(self.job_fun, CronTrigger.from_crontab(schedule), args=[ip, shell], id=id,
-                           replace_existing=True, max_instances=5)
+                           replace_existing=True, misfire_grace_time=5)
 
     def remove_crontjob(self, id):
         self.sched.remove_job(str(id))
