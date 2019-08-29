@@ -12,7 +12,7 @@ class LogModel(BaseModel):
     id = db.Column(Integer, primary_key=True, autoincrement=True)
     username = db.Column(String(32))
     behavior = db.Column(String(128))
-    create_time = db.Column(DateTime,default=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    create_time = db.Column(String(64),default=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
     def to_json(self):
         dict = copy.deepcopy(self.__dict__)

@@ -24,7 +24,7 @@ class WorkOrderModel(BaseModel):
     result = db.Column(String(256))
     user_id = db.Column(Integer, ForeignKey(UserModel.id))
     userinfo = relationship("UserModel", backref="work")
-    create_time = db.Column(DateTime,default=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    create_time = db.Column(String(64),default=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     comment = db.Column(String(64))
 
     def to_json(self):
