@@ -10,13 +10,13 @@ from app.lib.extensions import cron
 
 
 class WorkOrderApi(SecurityResource):
-    cloumn = ['type', 'name', 'sql', 'comment']
+    column = ['name', 'sql', 'comment']
 
     def get(self, tag=None):
 
         if tag:
             func = getattr(self, tag, 'database')
-            id=request.args['workId']
+            id = request.args['workId']
             return func(id)
         super(WorkOrderApi, self).get()
 
@@ -25,7 +25,7 @@ class WorkOrderApi(SecurityResource):
         if current_user.is_super():
             works = WorkOrderModel.query.all()
             for work in works:
-                data1=work.to_json()
+                data1 = work.to_json()
                 data1.update({'show': 1})
                 work_list.append(data1)
             data['super'] = 1
@@ -45,11 +45,9 @@ class WorkOrderApi(SecurityResource):
         form = WorkOrderForm(request.form, csrf=False)
         name = form.name.data
         sql = form.sql.data
-
         comment = form.comment.data
-        database = form.database.data if form.database.data else 'ops_db'
-        value_list = [type, name, sql, comment]
-        workinfo = dict(zip(self.cloumn, value_list))
+        value_list = [ name, sql, comment]
+        workinfo = dict(zip(self.column, value_list))
         workinfo['type'] = 1
         flag, res = self.check_sql(sql)
         if flag == 1:
@@ -76,7 +74,7 @@ class WorkOrderApi(SecurityResource):
     def put(self, tag=None):
         if tag:
             func = getattr(self, tag, 'audit')
-            id = request.form.get('auditid')
+            id = request.form.get('id')
             return func(id)
         super(WorkOrderApi, self).put()
 
@@ -87,7 +85,7 @@ class WorkOrderApi(SecurityResource):
         TaskModel.query.filter_by(id=id).delete()
         cron.remove_crontjob(id)
 
-    def database(self,id):
+    def database(self, id):
         super(WorkOrderApi, self).get()
         db = Mymysql()
         success, db_list = db.execute_one_sql('show databases')
@@ -104,7 +102,7 @@ class WorkOrderApi(SecurityResource):
         return self.render_json(data=data)
 
     def check_sql(self, sql):
-        Manipulation_list=['create','delete','update','alter','insert']
+        Manipulation_list = ['create', 'delete', 'update', 'alter', 'insert']
         flag = 1
         sql_list = sql.split(';')
         res = []
@@ -113,7 +111,7 @@ class WorkOrderApi(SecurityResource):
             sql_split = sql_line.split()
             if sql_line == '':
                 continue
-            if len(sql_split) < 2 :
+            if len(sql_split) < 2:
                 flag = 2
                 break
             res.append(sql_line)
@@ -140,25 +138,32 @@ class WorkOrderApi(SecurityResource):
         db.close()
 
     def audit(self, id):
-        self.super_api=True
-        super(WorkOrderApi,self).put()
+        self.super_api = True
+        super(WorkOrderApi, self).put()
         work = WorkOrderModel.query.filter_by(id=id).first()
-        sql_list=work.sql.split(';')
-        cron.add_sql_job(id,sql_list)
+        sql_list = work.sql.split(';')
+        cron.add_sql_job(id, sql_list)
         WorkOrderModel.query.filter_by(id=id).update({'audit': 1})
         return self.render_json()
 
     def execute(self, id):
-        self.super_api=True
-        super(WorkOrderApi,self).put()
+        self.super_api = True
+        super(WorkOrderApi, self).put()
         work = WorkOrderModel.query.filter_by(id=id).first()
-        if work.finish==1:
+        if work.finish == 1:
             return self.render_json(message='无法重复执行')
-        sql_list=work.sql.split(';')
-        cron.add_sql_job(id,sql_list)
+        sql_list = work.sql.split(';')
+        cron.add_sql_job(id, sql_list)
         return self.render_json(message='执行完成，请查看结果')
 
-    def item(self,id):
-        work= WorkOrderModel.query.filter_by(id=id).first()
-        data=work.to_json()
+    def item(self, id):
+        work = WorkOrderModel.query.filter_by(id=id).first()
+        data = work.to_json()
         return self.render_json(data=data)
+
+    def edit(self, id):
+        work=WorkOrderModel.query.filter_by(id=id).first()
+        for col in self.column:
+            setattr(work,col,request.form.get(col))
+        work.save()
+        return self.render_json()

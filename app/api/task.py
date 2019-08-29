@@ -9,7 +9,7 @@ from app.lib.extensions import cron
 
 
 class TaskApi(SecurityResource):
-    cloumn = ['business_id', 'schedule', 'shell', 'comment']
+    column = ['business_id', 'schedule', 'shell', 'comment']
     module = 'task'
 
     def get_tasks(self):
@@ -54,7 +54,7 @@ class TaskApi(SecurityResource):
         business_id = form.business_id.data
         ip = BusinessModel.query.filter_by(id=business_id).first().host
         value_list = [business_id, schedule, shell, comment]
-        taskinfo = dict(zip(self.cloumn, value_list))
+        taskinfo = dict(zip(self.column, value_list))
         task = TaskModel(**taskinfo)
         task.save()
         cron.add_cronjob(schedule, shell, str(task.id), ip)
@@ -71,7 +71,7 @@ class TaskApi(SecurityResource):
         business_id = form.business_id.data
         ip = BusinessModel.query.filter_by(id=business_id).first().host
         value_list = [business_id, schedule, shell, comment]
-        taskinfo = dict(zip(self.cloumn, value_list))
+        taskinfo = dict(zip(self.column, value_list))
         task = TaskModel.query.filter_by(id=id).first()
         before_list = [task.business_id, task.schedule, task.shell, task.comment]
         if value_list == before_list:
