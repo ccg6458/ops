@@ -1,14 +1,15 @@
-import pymysql, os
+import pymysql
+from app.config import Config
 
 
 class Mymysql():
     success = 1
 
     def __init__(self):
-        url = os.environ.get('MYSQL_URL', 'localhost')
-        user = os.environ.get('MYSQL_USER', 'root')
-        password = os.environ.get('MYSQL_PASSWORD', 'mifeng888')
-        database = os.environ.get('MYSQL_DATABASE', 'ops_db')
+        url = Config.PY_URL
+        user = Config.PY_USER
+        password = Config.PY_PASSWORD
+        database = Config.PY_DATABASE
         self.db = pymysql.connect(url, user, password, database)
         self.cursor = self.db.cursor()
 
