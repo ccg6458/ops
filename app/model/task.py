@@ -4,15 +4,11 @@ from sqlalchemy.orm import foreign, remote, relationship
 from . import BaseModel
 from .user import UserModel
 from .business import BusinessModel
+from app.lib.service import now
 import copy
-from datetime import datetime
 
 
 class TaskModel(BaseModel):
-    def __init__(self, *args, **kwargs):
-        self.create_time = datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
-        super(TaskModel, self).__init__(*args, **kwargs)
-
     __tablename__ = 'task'
     id = db.Column(Integer, primary_key=True, autoincrement=True)
     business_id = db.Column(Integer, ForeignKey(BusinessModel.id))
@@ -20,7 +16,7 @@ class TaskModel(BaseModel):
     shell = db.Column(TEXT)
     comment = db.Column(String(128))
     business = relationship("BusinessModel", backref="task")
-    create_time = db.Column(String(64))
+    create_time = db.Column(String(64), default=now)
 
     def to_json(self):
         dict = copy.deepcopy(self.__dict__)

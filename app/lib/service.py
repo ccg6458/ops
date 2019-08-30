@@ -160,3 +160,7 @@ class SendMsg():
         email.attach(self.content(code))
         self.smtp.login(self.mail_user, self.mail_password)
         self.smtp.sendmail(self.mail_user, email_address, email.as_string())
+
+
+def now():
+    return datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')

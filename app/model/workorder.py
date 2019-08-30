@@ -1,17 +1,13 @@
 from app.lib.extensions import db
+from app.lib.service import now
 from sqlalchemy import String, Integer, ForeignKey, DateTime, TEXT
 from sqlalchemy.orm import relationship
 from . import BaseModel
 from .user import UserModel
 import copy
-from datetime import datetime
 
 
 class WorkOrderModel(BaseModel):
-    def __init__(self, *args, **kwargs):
-        self.create_time = datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
-        super(WorkOrderModel, self).__init__(*args, **kwargs)
-
     type_msg = {
         1: 'sql执行',
         2: '域名相关',
@@ -29,7 +25,7 @@ class WorkOrderModel(BaseModel):
     result = db.Column(String(256))
     user_id = db.Column(Integer, ForeignKey(UserModel.id))
     userinfo = relationship("UserModel", backref="work")
-    create_time = db.Column(String(64))
+    create_time = db.Column(String(64), default=now)
     comment = db.Column(String(64))
 
     def to_json(self):
