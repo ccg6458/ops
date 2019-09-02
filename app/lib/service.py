@@ -23,7 +23,7 @@ class ShellExec():
     def exec(self, ip, shell):
         keyfile = Config.PRIVATE_KEY
         private_key = paramiko.RSAKey.from_private_key_file(keyfile)
-        self.ssh.connect(hostname=ip, port=22, username="root", pkey=private_key)
+        self.ssh.connect(hostname=ip, port=22, username="root", pkey=private_key,timeout=10)
         stdin, stdout, stderr = self.ssh.exec_command(shell)
         result = stdout.read().decode()
         now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
