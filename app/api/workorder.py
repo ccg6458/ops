@@ -52,7 +52,6 @@ class WorkOrderApi(SecurityResource):
             workinfo['finish'] = 1
             self.batch_execute_sql(res)
         elif flag == 2:
-            db.close()
             return self.render_json(code=3000, message='sql不合法')
         elif flag == 3:
             # 人工审核
