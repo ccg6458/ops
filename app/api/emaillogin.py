@@ -26,7 +26,7 @@ class EmailLogin(SecurityResource):
                 UserModel(email=email).save()
                 user = UserModel.query.filter_by(email=email).first()
             login_user(user, remember=True)
-            return self.render_json(data={'url': '/task'})
+            return self.render_json(data={'url': '/order'})
         return self.render_json(code=1001)
 
 
