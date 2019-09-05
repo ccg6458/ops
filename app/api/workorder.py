@@ -51,6 +51,7 @@ class WorkOrderApi(SecurityResource):
             workinfo['audit'] = 2
             workinfo['finish'] = 1
             self.batch_execute_sql(res)
+            workinfo['result'] = 'success'
         elif flag == 2:
             return self.render_json(code=3000, message='sql不合法')
         elif flag == 3:
