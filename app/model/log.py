@@ -12,7 +12,7 @@ class LogModel(BaseModel):
     __tablename__ = 'log'
     id = db.Column(Integer, primary_key=True, autoincrement=True)
     username = db.Column(String(32))
-    behavior = db.Column(String(128))
+    behavior = db.Column(String(512))
     create_time = db.Column(String(64), default=now)
 
     def to_json(self):
