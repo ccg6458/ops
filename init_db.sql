@@ -9,7 +9,7 @@ CREATE TABLE log
 (
     id INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
     username VARCHAR(32),
-    behavior TEXT,
+    behavior VARCHAR(512), 
     create_time VARCHAR(64)
 );
 CREATE TABLE operation
