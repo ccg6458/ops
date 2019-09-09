@@ -105,7 +105,7 @@ class CronJob():
         self.sched.add_job(self.exec_sql, args=[id, sql])
 
     def start(self, list):
-        self.init_cronjob(list)
+        #self.init_cronjob(list)
         self.sched.start()
 
 
